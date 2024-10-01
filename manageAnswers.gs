@@ -96,13 +96,13 @@ function changeLinkToLabel(sheet, row, columnName, label, documentType, link = n
 
   // Otherwise check for link inserted automatically 
   if (content.indexOf("drive.google") > -1) {   
-    // Link trovato
+    // Link found
     Logger.log("Aggiunta del link %s", documentType);
     cell.setFormula(Utilities.formatString('=HYPERLINK("%s";"%s")', content.toString(), label));
   }else{
     // Check if there is a strange content in the cell
     if(content.length != 0 && content != label) 
-      Logger.log("(%s) Contenuto non riconosciuto per la cella (%d,%d): %s", documentType, row, column, content);
+      Logger.log("(%s) Contenuto della cella (%d,%d) errato o personalizzato: %s", documentType, row, column, content);
     // else 
       // nop
   }
@@ -232,7 +232,7 @@ function addExpirationEvent(sheet, row){
 
 function manageAnswers() {
   /**** Retrieve form information ****/
-  let form = FormApp.openByUrl(GOOGLE_FORM);
+  let form = FormApp.openByUrl('https://docs.google.com/forms/d/1nQDBpDaQiw5KCdtacIS6Vg3WyXmzmKxLHaG3L6iBWog/edit');
   let formResponses = form.getResponses()[form.getResponses().length-1].getItemResponses();
   let linkToModify = form.getResponses()[form.getResponses().length-1].getEditResponseUrl();  
   let cf = formResponses[INDEX_CODICE_FISCALE].getResponse();
@@ -249,6 +249,9 @@ function manageAnswers() {
 
   /**** Link to text for certificato medico ****/
   changeLinkToLabel(sheet, lastModifiedRow, LINK_CERTIFICATO_MEDICO, TEXT_LINK_CERTIFICATO, "certificato medico");
+ 
+  /**** Link to text for certificato medico aggiornato ****/
+  changeLinkToLabel(sheet, lastModifiedRow, LINK_CERTIFICATO_MEDICO_AGGIORNATO, TEXT_LINK_CERTIFICATO, "certificato medico");
 
   /**** Link to text for foglio privacy ****/
   changeLinkToLabel(sheet, lastModifiedRow, LINK_PRIVACY, TEXT_LINK_FOGLIO_PRIVACY, "foglio privacy");
@@ -260,6 +263,8 @@ function manageAnswers() {
   changeLinkToLabel(sheet, lastModifiedRow, LINK_RATA_2, TEXT_LINK_SECONDA_RATA, "ricevuta 2° rata");
 
   /**** Text formatting ****/
+  formatField(sheet, lastModifiedRow, EMAIL, LOWECASE);
+  formatField(sheet, lastModifiedRow, INDIRIZZO_EMAIL, LOWECASE);
   formatField(sheet, lastModifiedRow, NOME_ATLETA, FISRT_CAPITAL);
   formatField(sheet, lastModifiedRow, COGNOME_ATLETA, FISRT_CAPITAL);
   formatField(sheet, lastModifiedRow, COMUNE_NASCITA, FISRT_CAPITAL);
@@ -289,7 +294,29 @@ function manageAnswers() {
     throw new Error("Errore invio email per %s (%s)", completeName, email)
 }
 
+/**
+ * Function to run manually to fix each time different issues
+ */
+function fixIssues(){
+  let sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  let cf=["CRNFBN79E07L407T"];
 
+  cf.forEach(cf=>{
+    let lastModifiedRow = getAddedRow(sheet, cf);
+    formatField(sheet, lastModifiedRow, EMAIL, LOWECASE);
+    formatField(sheet, lastModifiedRow, INDIRIZZO_EMAIL, LOWECASE);
+    formatField(sheet, lastModifiedRow, NOME_ATLETA, FISRT_CAPITAL);
+    formatField(sheet, lastModifiedRow, COGNOME_ATLETA, FISRT_CAPITAL);
+    formatField(sheet, lastModifiedRow, COMUNE_NASCITA, FISRT_CAPITAL);
+    formatField(sheet, lastModifiedRow, PROVINCIA_NASCITA, FISRT_CAPITAL);
+    formatField(sheet, lastModifiedRow, INDIRIZZO_RESIDENZA, FISRT_CAPITAL);
+    formatField(sheet, lastModifiedRow, COMUNE_RESIDENZA, FISRT_CAPITAL);
+    formatField(sheet, lastModifiedRow, PROVINCIA_RESIDENZA, FISRT_CAPITAL);
+    formatField(sheet, lastModifiedRow, NOME_GENITORE, FISRT_CAPITAL);
+    formatField(sheet, lastModifiedRow, COGNOME_GENITORE, FISRT_CAPITAL);
+  });
+
+}
 
 
 

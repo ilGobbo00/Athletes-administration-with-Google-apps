@@ -30,6 +30,7 @@ const SCADENZA_CERTIFICATO = "Inserisci la data di SCADENZA del certificato medi
 const NOME_GENITORE = "Nome tutore";
 const COGNOME_GENITORE = "Cognome tutore";
 const LINK_CERTIFICATO_MEDICO = "Carica certificato medico";
+const LINK_CERTIFICATO_MEDICO_AGGIORNATO = "Carica certificato medico (AGGIORNATO)";
 const LINK_PRIVACY = "Carica foglio privacy firmato";
 const LINK_RATA_1 = "Ricevuta 1° rata";	
 const LINK_RATA_2 = "Ricevuta 2° rata";
@@ -61,9 +62,10 @@ const INDEX_EMAIL_CONTATTO = 11;
 const INDEX_NUMERO_TELEFONO = 12;
 const INDEX_SCADENZA_CERTIFICATO = 13;
 const INDEX_CERTIFICATO_MEDICO = 14;
-const INDEX_FOGLIO_PRIVACY = 15;
-const INDEX_PRIMA_RATA = 16;
-const INDEX_SECONDA_RATA = 17;
+const INDEX_CERTIFICATO_MEDICO_AGGIORNATO = 15;
+const INDEX_FOGLIO_PRIVACY = 16;
+const INDEX_PRIMA_RATA = 17;
+const INDEX_SECONDA_RATA = 18;
 
 /**
  * Constants to define with how much advance the athletes are notified
