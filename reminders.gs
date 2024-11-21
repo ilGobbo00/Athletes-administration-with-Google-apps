@@ -53,12 +53,15 @@ function reminderPagamenti(){
   var firstPaymentIndex = headerRow.indexOf(PRIMA_RATA);
   var secondPaymentIndex = headerRow.indexOf(SECONDA_RATA);
   var emailIndex = headerRow.indexOf(EMAIL);
-  
-  var athletes = sheet.getRange("2:" + sheet.getLastRow()).getValues();
 
+  var athletes = sheet.getRange("2:" + sheet.getLastRow()).getValues();
+  
+  var row = 2;
   for(athlete of athletes){
     var completeName = athlete[nameIndex] + " " + athlete[surnameIndex];
     var email = athlete[emailIndex];
+    var responseLink = getCell(sheet, row, LINK_RISPOSTA).getRichTextValue().getLinkUrl();
+    row++;
 
 		// 1: paid, 0: not paid, other: future expansions
     var firstPayment = athlete[firstPaymentIndex];
@@ -80,7 +83,8 @@ function reminderPagamenti(){
 			if(numeroRata.length == 0) numeroRata += "seconda";
 			else numeroRata += " e seconda";
 
-		if(sendEmail(REMINDER_PAGAMENTO, email, numeroRata, completeName)) Logger.log("Email di notifica pagamento a %s inviata correttamente (prima rata: %d, seconda rata: %d, prima periodo: %s)", completeName, firstPayment, secondPayment, firstHalf);
+    var data = {'numero_rata' : numeroRata, 'link_risposta' : responseLink};
+		if(sendEmail(REMINDER_PAGAMENTO, email, data, completeName)) Logger.log("Email di notifica pagamento a %s inviata correttamente (prima rata: %d, seconda rata: %d, primo periodo: %s)", completeName, firstPayment, secondPayment, firstHalf);
 		else Logger.log("Problemi nell'invio email notifica pagamento a %s", completeName);
 
 		//Logger.log("Atleta: %s Email: %s Prima rata: %d Seconda rata: %d", completeName, email, firstPayment, secondPayment);
