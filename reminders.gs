@@ -59,22 +59,24 @@ function reminderPagamenti(){
   for(athlete of athletes){
     var completeName = athlete[nameIndex] + " " + athlete[surnameIndex];
     var email = athlete[emailIndex];
+
+		// 1: paid, 0: not paid, other: future expansions
     var firstPayment = athlete[firstPaymentIndex];
     var secondPayment = athlete[secondPaymentIndex];
 
-		
-		// 1: pagato, 0: non pagato, altro: da definire (possibili future espansioni)
-		if(firstPayment != 0 && secondPayment != 0){
-			Logger.log("L'atleta %s ha effetuato tutti i pagamenti (%s)", completeName, email);
-			continue;     // Tutti i pagamenti sono stati effetuati
+		var firstHalf = new Date().getMonth();                        // Variable to check if it's the first half of the year at execution
+		firstHalf = firstHalf >= 8 && firstHalf <= 11 ? true : false;
+
+    // The email is not sent if the payments are done within deadline
+    if((firstHalf && firstPayment == 1)||(!firstHalf && firstPayment == 1 && secondPayment == 1)) {
+			Logger.log("L'atleta %s ha effetuato tutti i pagamenti (prima rata: %d, seconda rata: %d) entro il %s periodo (%s)", 
+        completeName, firstPayment, secondPayment, firstHalf ? "primo" : "secondo", email);
+			continue;     // No payment to do for the specific deadline
 		} 
 
 		var numeroRata = ""; 
-		var firstHalf = new Date().getMonth(); // Variabile per non ricordare la seconda rata prima dell'inizio del nuovo anno
-		firstHalf = firstHalf >= 8 && firstHalf <= 11 ? true : false;
-
 		if(firstPayment == 0) numeroRata += "prima";
-		if(secondPayment == 0 && !firstHalf) 
+		if(!firstHalf && secondPayment == 0) 
 			if(numeroRata.length == 0) numeroRata += "seconda";
 			else numeroRata += " e seconda";
 
