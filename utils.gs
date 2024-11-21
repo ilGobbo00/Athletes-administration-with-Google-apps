@@ -20,27 +20,28 @@ function sendEmail(type, receiver, data, name){
     switch(type){
       case ISCRIZIONE_MODIFICA:
         htmlEmail = HtmlService.createHtmlOutputFromFile('EmailIscrizione.html').getContent();
-        htmlEmail = htmlEmail.replace("LINK_TO_MODIFY_RESPONSE", data);
-        htmlEmail = htmlEmail.replace("NAME_OF_THE_ATHLETE", name);
+        htmlEmail = htmlEmail.replaceAll("LINK_TO_MODIFY_RESPONSE", data);
+        htmlEmail = htmlEmail.replaceAll("NAME_OF_THE_ATHLETE", name);
         subject = 'Conferma iscrizione o aggiornamento certificato medico';
         break;
       case REMINDER_ISCRIZIONI:
         htmlEmail = HtmlService.createHtmlOutputFromFile('EmailReminderIscrizioni.html').getContent();
-        htmlEmail = htmlEmail.replace("ATHLETE_NAME", name);
+        htmlEmail = htmlEmail.replaceAll("ATHLETE_NAME", name);
         subject = name + " è ora di iscriversi!";
         break;
       case ISCRIZIONE_COLLEGE:
         break;
       case REMINDER_PAGAMENTO:
         htmlEmail = HtmlService.createHtmlOutputFromFile('EmailPagamenti.html').getContent();
-        htmlEmail = htmlEmail.replace("ATHLETE_NAME", name);
-        htmlEmail = htmlEmail.replace("NUMERO_RATA", data);
+        htmlEmail = htmlEmail.replaceAll("ATHLETE_NAME", name);
+        htmlEmail = htmlEmail.replaceAll("NUMERO_RATA", data['numero_rata']);
+        htmlEmail = htmlEmail.replaceAll("LINK_TO_MODIFY_RESPONSE", data['link_risposta']);
         subject = "Notifica pagamenti - " + name;
         break;
       case REMINDER_SCADENZA_CM:
         htmlEmail = HtmlService.createHtmlOutputFromFile('EmailScadenzaCM.html').getContent();
-        htmlEmail = htmlEmail.replace(new RegExp("NAME_OF_THE_ATHLETE", 'g'), name);
-        htmlEmail = htmlEmail.replace('DAY_OF_EXPIRATION', data);
+        htmlEmail = htmlEmail.replaceAll(new RegExp("NAME_OF_THE_ATHLETE", 'g'), name);
+        htmlEmail = htmlEmail.replaceAll('DAY_OF_EXPIRATION', data);
         subject = 'Scadenza certificato medico ' + name;
         break;
       default:
@@ -64,7 +65,7 @@ function sendEmail(type, receiver, data, name){
  * @param sheet Google Sheet reference
  * @param row Row of reference within resides the searched cell 
  * @param columnName Column name of the cell
- * @returns Reference to the cell row and column name provided
+ * @returns Reference (Range) to the cell row and column name provided
  */
 function getCell(sheet, row, columnName){
     let headerRow = sheet.getRange("1:1").getValues()[0];
@@ -72,3 +73,17 @@ function getCell(sheet, row, columnName){
     let cell = sheet.getRange(row, column);
     return cell;
   }
+
+/**
+ * Function to return the row index of the correspondent athlete (from 2 to `getLastRow()`)
+ * @param sheet Google Sheet reference
+ * @param fiscalCode Tax number of the athlete (unique)
+ * @returns The number of the corresponding row, -1 if not found
+ */
+function getRow(sheet, fiscalCode){
+  var lastRow = sheet.getLastRow();
+  for(let i=1; i<=lastRow; i++){
+    if(getCell(sheet, row, CODICE_FISCALE).getValue() == fiscalCode) return i;
+  }
+  return -1;
+}
