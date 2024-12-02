@@ -4,27 +4,27 @@
  */
 function reminderIscrizioni(){
 	// Controllo esecuzione: lo script deve essere a settembre
-	var thisMonth = new Date().getMonth();
+	let thisMonth = new Date().getMonth();
 	if(thisMonth != SETTEMBRE){
 		Logger.log("Mese d'esecuzione non corretto: lo script viene eseguito a settembre")
 		return;
 	} 
 
 	// Se dicembre o gennaio esegui lo script
-	var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[1];
+	let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[1];
 	
-	var headerRow = sheet.getRange("1:1").getValues()[0];
+	let headerRow = sheet.getRange("1:1").getValues()[0];
 
-	var nameIndex = headerRow.indexOf(NOME_ATLETA);
-	var surnameIndex = headerRow.indexOf(COGNOME_ATLETA);
-	var emailIndex = headerRow.indexOf(EMAIL);
+	let nameIndex = headerRow.indexOf(NOME_ATLETA);
+	let surnameIndex = headerRow.indexOf(COGNOME_ATLETA);
+	let emailIndex = headerRow.indexOf(EMAIL);
 	
-	var athletes = sheet.getRange("2:" + sheet.getLastRow()).getValues();
+	let athletes = sheet.getRange("2:" + sheet.getLastRow()).getValues();
 	
 	athletes.forEach(athlete => {
-		var completeName = athlete[nameIndex] + " " + athlete[surnameIndex];
-		var name = athlete[nameIndex];
-		var email = athlete[emailIndex];
+		let completeName = athlete[nameIndex] + " " + athlete[surnameIndex];
+		let name = athlete[nameIndex];
+		let email = athlete[emailIndex];
 
 		if(sendEmail(REMINDER_ISCRIZIONI, email, null, name)) Logger.log("Email di notifica reminder iscrizione a %s inviata correttamente", completeName);
 		else throw Error("Problemi nell'invio email notifica reminder iscrizione a %s", completeName);
@@ -37,37 +37,37 @@ function reminderIscrizioni(){
  */
 function reminderPagamenti(){
 	// Controllo esecuzione: lo script deve essere eseguito a dicembre e a gennaio 10 giorni prima della fine del mese
-	var thisMonth = new Date().getMonth();
+	let thisMonth = new Date().getMonth();
 	if(thisMonth != NOVEMBRE && thisMonth != GENNAIO){
 		Logger.log("Mese d'esecuzione non corretto: lo script viene eseguito a dicembre e a gennaio")
 		return;
 	} 
 
 	// Se dicembre o gennaio esegui lo script
-	var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+	let sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 	
-	var headerRow = sheet.getRange("1:1").getValues()[0];
+	let headerRow = sheet.getRange("1:1").getValues()[0];
 
-  var nameIndex = headerRow.indexOf(NOME_ATLETA);
-  var surnameIndex = headerRow.indexOf(COGNOME_ATLETA);
-  var firstPaymentIndex = headerRow.indexOf(PRIMA_RATA);
-  var secondPaymentIndex = headerRow.indexOf(SECONDA_RATA);
-  var emailIndex = headerRow.indexOf(EMAIL);
+  let nameIndex = headerRow.indexOf(NOME_ATLETA);
+  let surnameIndex = headerRow.indexOf(COGNOME_ATLETA);
+  let firstPaymentIndex = headerRow.indexOf(PRIMA_RATA);
+  let secondPaymentIndex = headerRow.indexOf(SECONDA_RATA);
+  let emailIndex = headerRow.indexOf(EMAIL);
 
-  var athletes = sheet.getRange("2:" + sheet.getLastRow()).getValues();
+  let athletes = sheet.getRange("2:" + sheet.getLastRow()).getValues();
   
-  var row = 2;
+  let row = 2;
   for(athlete of athletes){
-    var completeName = athlete[nameIndex] + " " + athlete[surnameIndex];
-    var email = athlete[emailIndex];
-    var responseLink = getCell(sheet, row, LINK_RISPOSTA).getRichTextValue().getLinkUrl();
+    let completeName = athlete[nameIndex] + " " + athlete[surnameIndex];
+    let email = athlete[emailIndex];
+    let responseLink = getCell(sheet, row, LINK_RISPOSTA).getRichTextValue().getLinkUrl();
     row++;
 
 		// 1: paid, 0: not paid, other: future expansions
-    var firstPayment = athlete[firstPaymentIndex];
-    var secondPayment = athlete[secondPaymentIndex];
+    let firstPayment = athlete[firstPaymentIndex];
+    let secondPayment = athlete[secondPaymentIndex];
 
-		var firstHalf = new Date().getMonth();                        // Variable to check if it's the first half of the year at execution
+		let firstHalf = new Date().getMonth();                        // letiable to check if it's the first half of the year at execution
 		firstHalf = firstHalf >= 8 && firstHalf <= 11 ? true : false;
 
     // The email is not sent if the payments are done within deadline
@@ -77,13 +77,13 @@ function reminderPagamenti(){
 			continue;     // No payment to do for the specific deadline
 		} 
 
-		var numeroRata = ""; 
+		let numeroRata = ""; 
 		if(firstPayment == 0) numeroRata += "prima";
 		if(!firstHalf && secondPayment == 0) 
 			if(numeroRata.length == 0) numeroRata += "seconda";
 			else numeroRata += " e seconda";
 
-    var data = {'numero_rata' : numeroRata, 'link_risposta' : responseLink};
+    let data = {'numero_rata' : numeroRata, 'link_risposta' : responseLink};
 		if(sendEmail(REMINDER_PAGAMENTO, email, data, completeName)) Logger.log("Email di notifica pagamento a %s inviata correttamente (prima rata: %d, seconda rata: %d, primo periodo: %s)", completeName, firstPayment, secondPayment, firstHalf);
 		else Logger.log("Problemi nell'invio email notifica pagamento a %s", completeName);
 
@@ -121,19 +121,19 @@ function getNextDates(monthInAdvance){
  *  Function to check the next certificates that will expire (base on the advance given by constants)
  */
 function reminderCertificatoMedico(){
-  var calendar = CalendarApp.getCalendarsByName(CALENDAR_NAME)[0];
-  var events = [];
+  let calendar = CalendarApp.getCalendarsByName(CALENDAR_NAME)[0];
+  let events = [];
   
   // Expirations for under 18 
-  var dates = getNextDates(ANTICIPO_AGONISTI_MINORENNI);
-  var startDate = dates[0];
-  var endDate = dates[1];
+  let dates = getNextDates(ANTICIPO_AGONISTI_MINORENNI);
+  let startDate = dates[0];
+  let endDate = dates[1];
 
   Logger.log("Controllo eventi (minorennni) dal %s al %s", startDate.toDateString(), endDate.toDateString());
-  var temp = 0;
+  let temp = 0;
 	// Add all events of under 18 into the array of the people that are notified
   calendar.getEvents(startDate, endDate).forEach((event) => {
-    var age = event.getTitle().match("[0-9]{1,2}");
+    let age = event.getTitle().match("[0-9]{1,2}");
     if(age === null) return false;
     if(age[0]>11 && age[0]<18) {events.push(event); temp++};	// From 11 to 18 they need to be notified with a lot of advance
   });
@@ -149,7 +149,7 @@ function reminderCertificatoMedico(){
   temp = 0;
 	// Add all events of over 18 into the array of the people that are notified
   calendar.getEvents(startDate, endDate).forEach((event) => {
-    var age = event.getTitle().match("[0-9]{1,2}");
+    let age = event.getTitle().match("[0-9]{1,2}");
     if(age === null) return false;
     if(age[0]<12 || age[0]>17 ) {events.push(event); temp++};
   });
@@ -157,17 +157,18 @@ function reminderCertificatoMedico(){
 
 
   events.forEach(event => {
-    var description = event.getDescription();
+    let description = event.getDescription();
     if(description.search("cadenza") == 0){
       Logger.log("Evento non corretto (%s)", event.getTitle());
       return;
     }
-    var completeName = description.split("\n")[DESC_COMPLETE_NAME]
-    var email = description.split("\n")[DESC_EMAIL]
-    var urlToForm = description.split("\n")[DESC_URL]
-    var date = LanguageApp.translate(Utilities.formatDate(event.getAllDayEndDate(), 'Europa/Roma', 'dd MMMM yyyy'), 'en', 'it');
+    let completeName = description.split("\n")[DESC_COMPLETE_NAME]
+    let email = description.split("\n")[DESC_EMAIL]
+    let urlToForm = description.split("\n")[DESC_URL]
+    let date = LanguageApp.translate(Utilities.formatDate(event.getAllDayEndDate(), 'Europa/Roma', 'dd MMMM yyyy'), 'en', 'it');
 
-    if(sendEmail(REMINDER_SCADENZA_CM, email, urlToForm, date, completeName)) 
+    let data = {'date' : date, 'url' : urlToForm};
+    if(sendEmail(REMINDER_SCADENZA_CM, email, data, completeName)) 
       Logger.log("Invio email per scadenza a " + completeName + " completato");
     else 
       throw new Error("Errore nell'invio email a " + completeName);

@@ -40,15 +40,16 @@ function sendEmail(type, receiver, data, name){
         break;
       case REMINDER_SCADENZA_CM:
         htmlEmail = HtmlService.createHtmlOutputFromFile('EmailScadenzaCM.html').getContent();
-        htmlEmail = htmlEmail.replaceAll(new RegExp("NAME_OF_THE_ATHLETE", 'g'), name);
-        htmlEmail = htmlEmail.replaceAll('DAY_OF_EXPIRATION', data);
+        htmlEmail = htmlEmail.replaceAll('NAME_OF_THE_ATHLETE', name);
+        htmlEmail = htmlEmail.replaceAll('DAY_OF_EXPIRATION', data['date']);
+        htmlEmail = htmlEmail.replaceAll('LINK_TO_MODIFY_RESPONSE', data['url']);
         subject = 'Scadenza certificato medico ' + name;
         break;
       default:
         Logger.log("Tipo di email non riconosciuto (%d)", type);
         return false;
     }
-    var options = {
+    let options = {
       htmlBody: htmlEmail,
       name: "Team JKR"
     };
@@ -81,7 +82,7 @@ function getCell(sheet, row, columnName){
  * @returns The number of the corresponding row, -1 if not found
  */
 function getRow(sheet, fiscalCode){
-  var lastRow = sheet.getLastRow();
+  let lastRow = sheet.getLastRow();
   for(let i=1; i<=lastRow; i++){
     if(getCell(sheet, row, CODICE_FISCALE).getValue() == fiscalCode) return i;
   }
